@@ -18,7 +18,11 @@
 		"type": "git",
 		"url": "git://github.com/rubaxa/callStack.git"
 	},
-	"keywords": ["stack", "call stack", "flow controll"],
+	"keywords": [
+		"stack",
+		"call stack",
+		"flow controll"
+	],
 	"author": "Konstantin Lebedev <ibnRubaXa@gmail.com>",
 	"license": "MIT"
 }

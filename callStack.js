@@ -6,21 +6,23 @@
 
 /*global define, module, window*/
 (function (factory) {
-	"use strict";
+	'use strict';
 
-	if (typeof define === "function" && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define([], function () {
 			return factory();
 		});
 	}
-	else if (typeof module != "undefined" && typeof module.exports != "undefined") {
+	else if (typeof module != 'undefined' && typeof module.exports != 'undefined') {
 		module.exports = factory();
 	}
 	else {
-		window["callStack"] = factory();
+		window['callStack'] = factory();
 	}
 })(function () {
-	"use strict";
+	'use strict';
+
+	var log = console.warn.bind(console, '[callStack]');
 
 	var _pid; // immediate id
 	var _order = ['default'];
@@ -88,17 +90,16 @@
 		if (left.length !== right.length) {
 			return true;
 		}
-		else {
-			var i = _mathMax(left.length, right.length);
 
-			while (i--) {
-				if (left[i] !== right[i]) {
-					return true;
-				}
+		var i = _mathMax(left.length, right.length);
+
+		while (i--) {
+			if (left[i] !== right[i]) {
+				return true;
 			}
-
-			return false;
 		}
+
+		return false;
 	}
 
 
@@ -108,6 +109,7 @@
 	 */
 	function _walkStackTick() {
 		if (_pid === void 0 || callStack.debounce === true) {
+			log('cancel Immediate');
 			_clearImmediate(_pid);
 			_pid = _setImmediate(_walkStack);
 		}
@@ -121,68 +123,48 @@
 	function _walkStack() {
 		_pid = void 0;
 
-		if (_pause === false) {
-			var name,
-				stack,
-				i,
-				n,
-				callee,
-				s = 0,
-				sn = _order.length,
-				ctx,
-				fn,
-				args;
+		if (_pause !== false) {
+			return;
+		}
 
-			for (; s < sn; s++) {
-				name = _order[s];
-				stack = _stacks[name];
+		var name,
+			stack,
+			i,
+			n,
+			callee,
+			s = 0,
+			sn = _order.length,
+			ctx,
+			fn,
+			args;
 
-				if ((stack !== void 0) && (stack.paused === false)) {
-					stack = stack.calls;
-					_stacks[name].calls = [];
+		for (; s < sn; s++) {
+			name = _order[s];
+			stack = _stacks[name];
 
-					i = 0;
-					n = stack.length;
-
-					for (; i < n; i++) {
-						callee = stack[i];
-						ctx = callee.ctx;
-						fn = callee.fn;
-						args = callee.args;
-
-						switch (args.length) {
-							case 0:
-								fn.call(ctx);
-								break;
-
-							case 1:
-								fn.call(ctx, args[0]);
-								break;
-
-							case 2:
-								fn.call(ctx, args[0], args[1]);
-								break;
-
-							case 3:
-								fn.call(ctx, args[0], args[1], args[2]);
-								break;
-
-							case 4:
-								fn.call(ctx, args[0], args[1], args[2], args[3]);
-								break;
-
-							default:
-								fn.apply(ctx, args);
-								break;
-						}
-					}
-				}
+			if (!((stack !== void 0) && (stack.paused === false))) {
+				continue;
 			}
 
-			i = _tickFns.length;
-			while (i--) {
-				_tickFns[i]();
+			stack = stack.calls;
+			_stacks[name].calls = [];
+
+			i = 0;
+			n = stack.length;
+
+			for (; i < n; i++) {
+				callee = stack[i];
+				ctx = callee.ctx;
+				fn = callee.fn;
+				args = callee.args;
+
+				fn.apply(ctx, args);
 			}
+		}
+
+		i = _tickFns.length;
+		while (i--) {
+			_tickFns[i]();
 		}
 	}
 
@@ -198,13 +180,11 @@
 
 		if (typeof fn === 'string') {
 			return ctx[fn] = this.wrap(ctx, ctx[fn], opts);
-		}
-		else if ((fn === void 0) || !(fn instanceof Function)) {
+		} else if ((fn === void 0) || !(fn instanceof Function)) {
 			opts = fn;
 			fn = ctx;
 			ctx = null;
 		}
-
 
 		// Default options
 		opts = opts || {
