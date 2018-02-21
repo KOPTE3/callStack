@@ -121,6 +121,7 @@
 	 * @private
 	 */
 	function _walkStack() {
+		log('_walkStack', [_pause, _order.toString()]);
 		_pid = void 0;
 
 		if (_pause !== false) {
