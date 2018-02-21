@@ -109,7 +109,7 @@
 	 */
 	function _walkStackTick() {
 		if (_pid === void 0 || callStack.debounce === true) {
-			log('cancel Immediate');
+			log(performance.now(), 'cancel Immediate');
 			_clearImmediate(_pid);
 			_pid = _setImmediate(_walkStack);
 		}
@@ -121,7 +121,7 @@
 	 * @private
 	 */
 	function _walkStack() {
-		log('_walkStack', [_pause, _order.toString()]);
+		log('_walkStack', performance.now(), [_pause, _order.toString()]);
 		_pid = void 0;
 
 		if (_pause !== false) {
